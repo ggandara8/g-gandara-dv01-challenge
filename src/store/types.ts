@@ -24,3 +24,10 @@ export type LoanState = {
   uniqueValues: () => Record<keyof Filters, string[]>;
   aggregateByGrade: () => Record<string, number>;
 };
+
+export const defaultFilters = {
+  homeOwnership: null,
+  quarter: null,
+  term: null,
+  year: null,
+};

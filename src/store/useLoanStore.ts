@@ -1,11 +1,12 @@
-// src/store/useDataStore.ts
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 import { getData } from "@/request/api";
-import type { LoanState } from "./types";
-import { aggregateByGrade } from "./helpers.ts/aggregateDataByGrade";
-import { matchesFilters } from "./helpers.ts/matchesFilter";
-import { getUniqueValues } from "./helpers.ts/uniqueValues";
+import { defaultFilters, type LoanState } from "./types";
+import {
+  aggregateCurrentBalanceByGrade,
+  matchesFilters,
+  getUniqueValuesForFilters,
+} from "./reducers";
 
 export const useDataStore = create<LoanState>()(
   devtools(
@@ -13,10 +14,7 @@ export const useDataStore = create<LoanState>()(
       (set, get) => ({
         rawData: [],
         filters: {
-          homeOwnership: null,
-          quarter: null,
-          term: null,
-          year: null,
+          ...defaultFilters,
         },
         fetchData: async () => {
           try {
@@ -37,16 +35,13 @@ export const useDataStore = create<LoanState>()(
         resetFilters: () => {
           set(() => ({
             filters: {
-              homeOwnership: null,
-              quarter: null,
-              term: null,
-              year: null,
+              ...defaultFilters,
             },
           }));
         },
         uniqueValues: () => {
           const { rawData } = get();
-          return getUniqueValues(rawData, [
+          return getUniqueValuesForFilters(rawData, [
             "homeOwnership",
             "quarter",
             "term",
@@ -63,7 +58,7 @@ export const useDataStore = create<LoanState>()(
           const dataToUse = filtersActive
             ? rawData.filter((item) => matchesFilters(item, filters))
             : rawData;
-          return aggregateByGrade(dataToUse);
+          return aggregateCurrentBalanceByGrade(dataToUse);
         },
       }),
       {
