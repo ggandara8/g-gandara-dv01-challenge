@@ -4,6 +4,8 @@ import { devtools, persist } from "zustand/middleware";
 import { getData } from "@/request/api";
 import type { LoanState } from "./types";
 import { aggregateByGrade } from "./helpers.ts/aggregateDataByGrade";
+import { matchesFilters } from "./helpers.ts/matchesFilter";
+import { getUniqueValues } from "./helpers.ts/uniqueValues";
 
 export const useDataStore = create<LoanState>()(
   devtools(
@@ -44,47 +46,23 @@ export const useDataStore = create<LoanState>()(
         },
         uniqueValues: () => {
           const { rawData } = get();
-          const unique = {
-            homeOwnership: new Set<string>(),
-            quarter: new Set<string>(),
-            term: new Set<string>(),
-            year: new Set<string>(),
-          };
-
-          rawData.forEach((item) => {
-            unique.homeOwnership.add(item.homeOwnership);
-            unique.quarter.add(item.quarter);
-            unique.term.add(item.term);
-            unique.year.add(item.year);
-          });
-
-          return {
-            homeOwnership: Array.from(unique.homeOwnership).sort(),
-            quarter: Array.from(unique.quarter).sort(),
-            term: Array.from(unique.term).sort(),
-            year: Array.from(unique.year).sort(),
-          };
+          return getUniqueValues(rawData, [
+            "homeOwnership",
+            "quarter",
+            "term",
+            "year",
+          ]);
         },
-
         filteredData: () => {
           const { rawData, filters } = get();
-          return rawData.filter((item) => {
-            return (
-              (filters.homeOwnership === null ||
-                item.homeOwnership === filters.homeOwnership) &&
-              (filters.quarter === null || item.quarter === filters.quarter) &&
-              (filters.term === null || item.term === filters.term) &&
-              (filters.year === null || item.year === filters.year)
-            );
-          });
+          return rawData.filter((item) => matchesFilters(item, filters));
         },
-
         aggregateByGrade: () => {
           const { filters, rawData } = get();
-          const filtered = get().filteredData(); // or re-implement here
-          const dataToUse = Object.values(filters).every((v) => v === null)
-            ? rawData
-            : filtered;
+          const filtersActive = Object.values(filters).some((v) => v !== null);
+          const dataToUse = filtersActive
+            ? rawData.filter((item) => matchesFilters(item, filters))
+            : rawData;
           return aggregateByGrade(dataToUse);
         },
       }),
