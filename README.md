@@ -78,12 +78,10 @@ npm run dev
 
 ## Folder Structure
 
-src/
-├── components/    # Filters, chart, table
-├── store/         # Zustand global state
-├── utils/         # Aggregation, filtering, formatting
-├── request/       # API
-└── App.tsx        # Main app layout
+- **`/components`**: Filters, chart, table
+- **`/store`**: Zustand global state
+- **`/request`**: The `getData` API.
+- **`/utils`**: Aggregation, filtering, formatting
 
 ## 🧪 Testing
 
