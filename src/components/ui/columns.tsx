@@ -13,6 +13,6 @@ export function generateGradeColumns(
   return grades.map((grade) => ({
     accessorKey: grade,
     header: `Grade ${grade}`,
-    cell: ({ row }) => <div className="text-left">${row.getValue(grade)}</div>,
+    cell: ({ row }) => <div className="text-left">{row.getValue(grade)}</div>,
   }));
 }
