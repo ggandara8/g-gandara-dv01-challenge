@@ -1,9 +1,10 @@
-// components/aggregated-table.tsx
 import { useMemo } from "react";
 import { useDataStore } from "@/store/useLoanStore";
 import { generateGradeColumns } from "@/components/ui/columns";
 import { DataTable } from "@/components/ui/data-table";
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { currencyFormatter } from "@/utils/formatters";
 
 export function AggregatedTable() {
   const { resetFilters, aggregateByGrade } = useDataStore();
@@ -14,7 +15,7 @@ export function AggregatedTable() {
       Object.fromEntries(
         Object.entries(aggregated).map(([grade, total]) => [
           grade,
-          total.toFixed(2),
+          currencyFormatter.format(total),
         ])
       ),
     ];
@@ -27,13 +28,23 @@ export function AggregatedTable() {
   );
 
   return (
-    <div>
-      <DataTable columns={dynamicColumns} data={aggregatedTableData} />
-      <div>
-        <Button variant="ghost" onClick={resetFilters}>
-          Reset Filters
-        </Button>
-      </div>
-    </div>
+    <Card>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <CardTitle>Aggregated Balances</CardTitle>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={resetFilters}
+            className="p-4"
+          >
+            Reset Filters
+          </Button>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <DataTable columns={dynamicColumns} data={aggregatedTableData} />
+      </CardContent>
+    </Card>
   );
 }
