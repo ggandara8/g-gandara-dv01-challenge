@@ -4,7 +4,7 @@ import { generateGradeColumns } from "@/components/ui/columns";
 import { DataTable } from "@/components/ui/data-table";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { currencyFormatter } from "@/utils/formatters";
+import { currencyFormatter } from "@/utils/index";
 
 export function AggregatedTable() {
   const { resetFilters, aggregateByGrade } = useDataStore();

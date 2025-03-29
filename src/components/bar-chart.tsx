@@ -12,7 +12,7 @@ import {
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { useDataStore } from "@/store/useLoanStore";
 import { useMemo } from "react";
-import { currencyFormatter } from "@/utils/formatters";
+import { currencyFormatter } from "@/utils/index";
 
 export function GradeBarChart() {
   const { aggregateByGrade } = useDataStore();
