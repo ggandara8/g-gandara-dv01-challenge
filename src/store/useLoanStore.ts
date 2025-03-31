@@ -8,14 +8,20 @@ import {
   getUniqueValuesForFilters,
 } from "./reducers";
 
+// Global Zustand store to manage loan data, filters, and derived aggregations
 export const useDataStore = create<LoanState>()(
   devtools(
     persist(
       (set, get) => ({
+        // Raw loan data loaded from API
         rawData: [],
+
+        // Current selected filter state
         filters: {
           ...defaultFilters,
         },
+
+        // Async fetch method to load data
         fetchData: async () => {
           try {
             const data = await getData();
@@ -24,6 +30,8 @@ export const useDataStore = create<LoanState>()(
             console.error("Failed to fetch data:", error);
           }
         },
+
+        // Update a specific filter (e.g. year, term, quarter, etc.)
         setFilter: (key, value) => {
           set((state) => ({
             filters: {
@@ -32,6 +40,8 @@ export const useDataStore = create<LoanState>()(
             },
           }));
         },
+
+        // Reset all filters back to initial state
         resetFilters: () => {
           set(() => ({
             filters: {
@@ -39,6 +49,8 @@ export const useDataStore = create<LoanState>()(
             },
           }));
         },
+
+        // Compute unique values for dropdown options based on raw data
         uniqueValues: () => {
           const { rawData } = get();
           return getUniqueValuesForFilters(rawData, [
@@ -48,10 +60,16 @@ export const useDataStore = create<LoanState>()(
             "year",
           ]);
         },
+
+        // Return a filtered subset of the raw data based on current filters
         filteredData: () => {
           const { rawData, filters } = get();
           return rawData.filter((item) => matchesFilters(item, filters));
         },
+
+        // Return total balance aggregated by grade
+        // If no filters are active, it returns aggregate from rawData
+        // Otherwise, it computes from the filtered subset
         aggregateByGrade: () => {
           const { filters, rawData } = get();
           const filtersActive = Object.values(filters).some((v) => v !== null);
@@ -62,8 +80,10 @@ export const useDataStore = create<LoanState>()(
         },
       }),
       {
-        name: "loan-store",
+        name: "loan-store", // Store key for persistence
         skipHydration: false,
+
+        // Rehydrate persisted store & refetch data if necessary
         onRehydrateStorage: () => {
           return (state) => {
             if (state?.rawData.length === 0) {
